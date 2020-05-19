@@ -9,7 +9,6 @@ public class ClientWrite implements Runnable {
 
     private Socket socket;
     private DataOutputStream dos;
-    private boolean isRunning = true;
     private ClientFrame frame;
     private String name;
 
@@ -17,8 +16,13 @@ public class ClientWrite implements Runnable {
     public void run() {
         try {
             dos = new DataOutputStream(socket.getOutputStream());
+
+            // 首先发送信息
+            send(name);
             String msg = frame.getTextArea2().getText();
             send(msg);
+            // 清空发送区
+            frame.getTextArea2().setText("");
         }catch (Exception e){
             e.printStackTrace();
         }finally {
@@ -44,11 +48,14 @@ public class ClientWrite implements Runnable {
      */
     private void release(){
         ChatUtils.close(socket, dos);
-        isRunning = false;
     }
 
-    public ClientWrite(Socket socket, ClientFrame frame, String name) {
-        this.socket = socket;
+    public ClientWrite(ClientFrame frame, String name) {
+        try {
+            this.socket = new Socket("localhost", 8887);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         this.frame = frame;
         this.name = name;
     }

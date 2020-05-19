@@ -1,4 +1,5 @@
 import java.io.*;
+import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
@@ -6,39 +7,25 @@ import java.net.Socket;
  */
 public class ClientRead implements Runnable {
 
-    private Socket socket;
-    private DataInputStream dis;
-    private DataOutputStream dos;
-    private boolean isRunning = true;
-    private ClientFrame frame;
+
+    private ServerSocket serverSocket;
     private GuiOutputStream gos;
-    private String name;
+    private ClientFrame frame;
 
     @Override
     public void run() {
         System.setOut(gos);
+        DataInputStream dis;
         try {
-            dis = new DataInputStream(socket.getInputStream());
-            dos = new DataOutputStream(socket.getOutputStream());
-            // 在开始读之前发送自身信息
-            dos.writeUTF(name);
-            dos.flush();
-            // 之后就一直接受信息
-            while (isRunning){
-                recv();
+            while (true){
+                Socket ss = serverSocket.accept();
+                dis = new DataInputStream(ss.getInputStream());
+                System.out.println(dis.readUTF());
+                dis.close();
             }
         }catch (IOException e){
             e.printStackTrace();
-            release();
-        }
-    }
-
-    public void recv(){
-        try {
-            String s = dis.readUTF();
-            System.out.println(s);
-        }catch (Exception e){
-            e.printStackTrace();
+        }finally {
             release();
         }
     }
@@ -47,14 +34,12 @@ public class ClientRead implements Runnable {
      * 回收资源
      */
     private void release(){
-        ChatUtils.close(socket, dis);
-        isRunning = false;
+        ChatUtils.close(serverSocket, gos);
     }
 
-    public ClientRead(Socket socket, ClientFrame frame, String name) {
-        this.socket = socket;
+    public ClientRead(ServerSocket serverSocket, ClientFrame frame) {
+        this.serverSocket = serverSocket;
         this.frame = frame;
-        this.name = name;
-        gos = new GuiOutputStream(System.out, frame.getTextArea1());    // gui输出
+        gos = new GuiOutputStream(System.out, frame.getTextArea1());
     }
 }

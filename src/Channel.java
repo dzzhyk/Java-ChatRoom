@@ -1,64 +1,53 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.Socket;
+import java.util.Objects;
 
-/**
- * 服务端通讯封装类
- */
-public class Channel implements Runnable {
+public class Channel{
 
-    private Socket socket;
-    private DataInputStream dis;
-    private DataOutputStream dos;
-    private boolean isRunning = true;
+    private String host;
+    private int port;
     private String name;
 
-    @Override
-    public void run() {
-        try {
-            dis = new DataInputStream(socket.getInputStream());
-            dos = new DataOutputStream(socket.getOutputStream());
-            name = recv();  // 获取名字
-            ChatUtils.setServerOnlineClients(); // 更新用户列表
-            broadCast(name + "加入了聊天室");
-
-            // 退出之后
-            Server.getUsers().remove(this);
-            ChatUtils.setServerOnlineClients(); // 更新用户列表
-            broadCast(name + "退出了聊天室");
-        }catch (IOException e){
-            e.printStackTrace();
-            release();
-        }
+    public Channel(String host, int port, String name) {
+        this.host = host;
+        this.port = port;
+        this.name = name;
     }
 
-    /**
-     * 接收
-     */
-    private String recv(){
-        String msg = "";
-        try {
-            msg = dis.readUTF();
-            System.out.println("server接收");
-        }catch (Exception e){
-            release();
-        }
-        return msg;
+    public String getHost() {
+        return host;
     }
 
+    public void setHost(String host) {
+        this.host = host;
+    }
 
+    public int getPort() {
+        return port;
+    }
 
-
-
-
-    public Channel(Socket socket) {
-        this.socket = socket;
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public String getName() {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Channel channel = (Channel) o;
+        return port == channel.port &&
+                host.equals(channel.host) &&
+                name.equals(channel.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(host, port, name);
+    }
 }

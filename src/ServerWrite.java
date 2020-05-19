@@ -1,6 +1,5 @@
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
@@ -8,17 +7,15 @@ import java.net.Socket;
  */
 public class ServerWrite implements Runnable {
 
-    private ServerSocket serverSocket;
+    private Socket socket;
     private DataOutputStream dos;
+    private String host;
+    private int port;
+    private String msg;
 
     @Override
     public void run() {
-        try {
-            dos = new DataOutputStream(ss.getOutputStream());
-
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+        send(msg);
     }
 
     /**
@@ -28,16 +25,11 @@ public class ServerWrite implements Runnable {
         try {
             dos.writeUTF(msg);
             dos.flush();
-            System.out.println("server发送");
+            System.out.println("Server==>"+host+"@"+port);
         }catch (Exception e){
-            release();
-        }
-    }
 
-    // 系统消息
-    public void broadCast(String msg){
-        for (Channel user : Server.getUsers()) {
-            user.send("<系统消息>: " + msg);
+        }finally {
+            release();
         }
     }
 
@@ -45,10 +37,18 @@ public class ServerWrite implements Runnable {
      * 回收资源
      */
     private void release(){
-        ChatUtils.close(serverSocket, dos);
+        ChatUtils.close(socket, dos);
     }
 
-    public ServerWrite(ServerSocket serverSocket) {
-        this.serverSocket = serverSocket;
+    public ServerWrite(String host, int port, String msg) {
+        this.host = host;
+        this.port = port;
+        this.msg = msg;
+        try {
+            this.socket = new Socket(host, port);
+            this.dos = new DataOutputStream(socket.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -15,6 +15,9 @@ public class ClientFrame extends JFrame {
     }
 
     private void button2ActionPerformed(ActionEvent e) {
+        if ("".equals(textArea2.getText().trim())){
+            return;
+        }
         // 发送消息
         client.send();
     }
@@ -24,6 +27,8 @@ public class ClientFrame extends JFrame {
     }
 
     private void thisWindowClosing(WindowEvent e) {
+        // 客户端退出时操作
+        client.exit();
     }
 
     public JTextArea getTextArea1() {
@@ -38,6 +43,25 @@ public class ClientFrame extends JFrame {
         return button2;
     }
 
+    public JLabel getLabel3() {
+        return label3;
+    }
+
+    private void button2KeyReleased(KeyEvent e) {
+
+    }
+
+    private void textArea2KeyReleased(KeyEvent e) {
+        int keyCode = e.getKeyCode();
+        if (keyCode==KeyEvent.VK_ENTER){
+            if ("".equals(textArea2.getText().trim())){
+                return;
+            }
+            // 发送消息
+            client.send();
+        }
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -50,6 +74,8 @@ public class ClientFrame extends JFrame {
         label1 = new JLabel();
         vSpacer1 = new JPanel(null);
         hSpacer1 = new JPanel(null);
+        label2 = new JLabel();
+        label3 = new JLabel();
 
         //======== this ========
         setTitle("\u5ba2\u6237\u7aef");
@@ -82,8 +108,22 @@ public class ClientFrame extends JFrame {
         button2.addActionListener(e -> {
 			button2ActionPerformed(e);
 		});
+        button2.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                button2KeyReleased(e);
+            }
+        });
         contentPane.add(button2);
         button2.setBounds(new Rectangle(new Point(230, 305), button2.getPreferredSize()));
+
+        //---- textArea2 ----
+        textArea2.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                textArea2KeyReleased(e);
+            }
+        });
         contentPane.add(textArea2);
         textArea2.setBounds(15, 265, 205, 65);
 
@@ -106,6 +146,16 @@ public class ClientFrame extends JFrame {
         vSpacer1.setBounds(155, 330, 20, 15);
         contentPane.add(hSpacer1);
         hSpacer1.setBounds(305, 140, 15, 20);
+
+        //---- label2 ----
+        label2.setText("\u5f53\u524d\u7528\u6237\uff1a");
+        contentPane.add(label2);
+        label2.setBounds(110, 225, 75, 30);
+
+        //---- label3 ----
+        label3.setText("\u672a\u767b\u5f55");
+        contentPane.add(label3);
+        label3.setBounds(190, 230, 115, 20);
 
         {
             // compute preferred size
@@ -136,5 +186,7 @@ public class ClientFrame extends JFrame {
     private JLabel label1;
     private JPanel vSpacer1;
     private JPanel hSpacer1;
+    private JLabel label2;
+    private JLabel label3;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

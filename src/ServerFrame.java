@@ -42,6 +42,21 @@ public class ServerFrame extends JFrame {
         return button1;
     }
 
+    private void button1ActionPerformed(ActionEvent e) {
+        Server.sendServerMsg(textArea3.getText());
+    }
+
+    private void button1KeyReleased(KeyEvent e) {
+
+    }
+
+    private void textArea3KeyReleased(KeyEvent e) {
+        int keyCode = e.getKeyCode();
+        if (keyCode==KeyEvent.VK_ENTER){
+            Server.sendServerMsg(textArea3.getText());
+        }
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -111,6 +126,14 @@ public class ServerFrame extends JFrame {
         }
         contentPane.add(scrollPane2);
         scrollPane2.setBounds(240, 55, 110, 240);
+
+        //---- textArea3 ----
+        textArea3.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                textArea3KeyReleased(e);
+            }
+        });
         contentPane.add(textArea3);
         textArea3.setBounds(15, 330, 220, 90);
 
@@ -121,6 +144,13 @@ public class ServerFrame extends JFrame {
 
         //---- button1 ----
         button1.setText("\u53d1\u9001");
+        button1.addActionListener(e -> button1ActionPerformed(e));
+        button1.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                button1KeyReleased(e);
+            }
+        });
         contentPane.add(button1);
         button1.setBounds(255, 350, button1.getPreferredSize().width, 65);
 

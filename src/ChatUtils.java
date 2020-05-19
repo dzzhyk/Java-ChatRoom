@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * 工具类
@@ -58,10 +59,10 @@ public class ChatUtils {
      */
     public static void setServerOnlineClients(){
         JTextArea textArea2 = Server.getFrame().getTextArea2();
-        textArea2.setText(genUserList(Server.getUsers()));
+//        textArea2.setText(genUserList(Server.getUsers()));
     }
 
-    private static String genUserList(CopyOnWriteArrayList<Channel> users){
+    public static String genUserList(CopyOnWriteArraySet<Channel> users){
         StringBuilder builder = new StringBuilder();
         for (Channel user : users) {
             if (user==null){
@@ -70,5 +71,16 @@ public class ChatUtils {
             builder.append(user.getName()).append("\n");
         }
         return builder.toString();
+    }
+
+    /**
+     * 将消息广播给所有用户
+     */
+    public static void broadCast(String msg){
+        if (!"".equals(msg)){
+            for (Channel user : Server.getUsers()) {
+                new Thread(new ServerWrite(user.getHost(), user.getPort(), msg)).start();
+            }
+        }
     }
 }
